@@ -1,15 +1,11 @@
 from fastapi import FastAPI
+from app.api.routes import router as main_router
+from app.api.users import router as users_router
 
-app = FastAPI()
+app = FastAPI(
+    title="Backend Foundation",
+    version="1.0.0"
+)
 
-@app.get("/")
-def home():
-    return {"message": "Mission Global Engineer - Backend Started 🚀"}
-
-@app.get("/about")
-def about():
-    return {
-        "name": "Hitesh Khairnar",
-        "role": "Backend Developer & AI Engineer",
-        "mission": "Mission Global Engineer"
-    }
+app.include_router(main_router)     # ✅ Correct
+app.include_router(users_router)    # ✅ Correct
