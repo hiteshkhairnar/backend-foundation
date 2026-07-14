@@ -1,28 +1,26 @@
-from fastapi import APIRouter, HTTPException
-from pydantic import BaseModel
+from fastapi import APIRouter, Depends
+from sqlalchemy.orm import Session
 
-router = APIRouter(prefix="/users", tags=["Users"])
+from app.database.database import get_db
+from app.schemas.user import UserCreate, UserResponse
+from app.services.user_service import create_user, get_users
 
-class User(BaseModel):
-    name: str
-    email: str
+router = APIRouter(
+    prefix="/users",
+    tags=["Users"]
+)
 
-users = []
 
-@router.get("/")
-def get_users():
-    return users
+@router.post("/", response_model=UserResponse)
+def create_new_user(
+    user: UserCreate,
+    db: Session = Depends(get_db)
+):
+    return create_user(db, user)
 
-@router.post("/")
-def create_user(user: User):
-    users.append(user)
-    return {
-        "message": "User created successfully",
-        "user": user
-    }
 
-@router.get("/{user_id}")
-def get_user(user_id: int):
-    if user_id >= len(users):
-        raise HTTPException(status_code=404, detail="User not found")
-    return users[user_id]
+@router.get("/", response_model=list[UserResponse])
+def read_users(
+    db: Session = Depends(get_db)
+):
+    return get_users(db)
