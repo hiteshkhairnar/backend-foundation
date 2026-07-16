@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from app.database.database import get_db
@@ -7,7 +7,7 @@ from app.services.user_service import (
     create_user,
     get_users,
     update_user,
-    delete_user
+    delete_user,
 )
 
 router = APIRouter(
@@ -21,7 +21,15 @@ def create_new_user(
     user: UserCreate,
     db: Session = Depends(get_db)
 ):
-    return create_user(db, user)
+    new_user = create_user(db, user)
+
+    if not new_user:
+        raise HTTPException(
+            status_code=409,
+            detail="Email already exists"
+        )
+
+    return new_user
 
 
 @router.get("/", response_model=list[UserResponse])
@@ -29,6 +37,7 @@ def read_users(
     db: Session = Depends(get_db)
 ):
     return get_users(db)
+
 
 @router.put("/{user_id}", response_model=UserResponse)
 def update_existing_user(
@@ -39,7 +48,10 @@ def update_existing_user(
     updated_user = update_user(db, user_id, user)
 
     if not updated_user:
-        raise HTTPException(status_code=404, detail="User not found")
+        raise HTTPException(
+            status_code=404,
+            detail="User not found"
+        )
 
     return updated_user
 
@@ -52,7 +64,10 @@ def delete_existing_user(
     deleted_user = delete_user(db, user_id)
 
     if not deleted_user:
-        raise HTTPException(status_code=404, detail="User not found")
+        raise HTTPException(
+            status_code=404,
+            detail="User not found"
+        )
 
     return {
         "message": "User deleted successfully"

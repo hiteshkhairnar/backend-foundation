@@ -4,6 +4,11 @@ from app.schemas.user import UserCreate
 
 
 def create_user(db: Session, user: UserCreate):
+    existing_user = db.query(User).filter(User.email == user.email).first()
+
+    if existing_user:
+        return None
+
     db_user = User(
         name=user.name,
         email=user.email
