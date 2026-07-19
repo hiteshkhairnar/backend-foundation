@@ -7,8 +7,21 @@ from app.database.base import Base
 class User(Base):
     __tablename__ = "users"
 
-    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    id: Mapped[int] = mapped_column(
+        Integer,
+        primary_key=True,
+        index=True
+    )
 
-    name: Mapped[str] = mapped_column(String(100))
+    name: Mapped[str] = mapped_column(
+        String(100)
+    )
 
-    email: Mapped[str] = mapped_column(String(100), unique=True)
+    email: Mapped[str] = mapped_column(
+        String(100),
+        unique=True
+    )
+
+    hashed_password: Mapped[str] = mapped_column(
+        String(255)
+    )
