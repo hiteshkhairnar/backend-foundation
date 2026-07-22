@@ -1,16 +1,10 @@
-from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy.orm import Session
-from app.schemas.user import UserLogin
-from app.auth.dependencies import get_current_user
-from app.models.user import User
+from fastapi import APIRouter, Depends, HTTPException, UploadFile, File
 from fastapi.security import OAuth2PasswordRequestForm
-from app.schemas.user import UserResponse
-from app.auth.dependencies import get_current_user
-from app.models.user import User
-from app.auth.admin import admin_required
+from sqlalchemy.orm import Session
 
 from app.database.database import get_db
-from app.schemas.user import UserCreate, UserResponse
+from app.models.user import User
+from app.schemas.user import UserCreate, UserResponse, UserLogin
 from app.services import user_service
 from app.services.user_service import (
     create_user,
@@ -19,6 +13,10 @@ from app.services.user_service import (
     delete_user,
     login_user,
 )
+
+from app.auth.dependencies import get_current_user
+from app.auth.admin import admin_required
+from app.services.upload_service import save_profile_image
 
 router = APIRouter(
     prefix="/users",
@@ -109,4 +107,22 @@ def admin_dashboard(current_user=Depends(admin_required)):
     return {
         "message": "Welcome Admin!",
         "user": current_user.email
+    }
+
+@router.post("/upload-profile-image")
+def upload_profile_image(
+    file: UploadFile = File(...),
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    image_path = save_profile_image(file)
+
+    current_user.profile_image = image_path
+
+    db.commit()
+    db.refresh(current_user)
+
+    return {
+        "message": "Profile image uploaded successfully",
+        "image_url": image_path,
     }
