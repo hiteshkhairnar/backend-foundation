@@ -6,10 +6,11 @@ from app.auth.jwt_handler import create_access_token
 
 def create_user(db: Session, user: UserCreate):
     db_user = User(
-        name=user.name,
-        email=user.email,
-        hashed_password=hash_password(user.password)
-    )
+    name=user.name,
+    email=user.email,
+    hashed_password=hash_password(user.password),
+    role="user"
+)
 
     db.add(db_user)
     db.commit()

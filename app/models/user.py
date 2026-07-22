@@ -1,4 +1,4 @@
-from sqlalchemy import Integer, String
+from sqlalchemy import Column, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.database.base import Base
@@ -25,3 +25,5 @@ class User(Base):
     hashed_password: Mapped[str] = mapped_column(
         String(255)
     )
+
+    role = Column(String(20), default="user")
