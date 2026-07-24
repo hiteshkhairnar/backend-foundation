@@ -8,6 +8,7 @@ from app.schemas.user import UserCreate, UserResponse, UserLogin
 from app.services.user_service import (
     create_user,
     get_users,
+    get_user_with_posts,
     update_user,
     delete_user,
     login_user,
@@ -16,6 +17,7 @@ from app.services.user_service import (
 from app.auth.dependencies import get_current_user
 from app.auth.admin import admin_required
 from app.services.upload_service import save_profile_image
+from app.schemas.user import UserWithPosts
 
 router = APIRouter(
     prefix="/users",
@@ -87,6 +89,20 @@ def read_users(
         }
     }
 
+@router.get("/{user_id}", response_model=UserWithPosts)
+def read_user(
+    user_id: int,
+    db: Session = Depends(get_db)
+):
+    user = get_user_with_posts(db, user_id)
+
+    if not user:
+        raise HTTPException(
+            status_code=404,
+            detail="User not found"
+        )
+
+    return user
 
 # Update User
 @router.put("/{user_id}", response_model=UserResponse)

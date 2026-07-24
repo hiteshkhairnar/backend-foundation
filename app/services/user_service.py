@@ -4,6 +4,7 @@ from app.schemas.user import UserCreate, UserLogin
 from app.utils.hashing import hash_password, verify_password
 from app.auth.jwt_handler import create_access_token
 from sqlalchemy import or_, desc
+from sqlalchemy.orm import joinedload
 
 def create_user(db: Session, user: UserCreate):
     db_user = User(
@@ -63,6 +64,14 @@ def get_users(
         "limit": limit,
         "users": users
     }
+
+def get_user_with_posts(db: Session, user_id: int):
+    return (
+        db.query(User)
+        .options(joinedload(User.posts))
+        .filter(User.id == user_id)
+        .first()
+    )
 
 
 def update_user(db: Session, user_id: int, user: UserCreate):
