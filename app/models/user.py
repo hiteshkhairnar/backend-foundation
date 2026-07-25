@@ -19,3 +19,20 @@ class User(Base):
         back_populates="owner",
         cascade="all, delete"
     )
+
+    comments = relationship(
+    "Comment",
+    back_populates="owner",
+    cascade="all, delete"
+)
+    likes = relationship(
+    "Like",
+    back_populates="owner",
+    cascade="all, delete"
+)
+
+    bookmarks = relationship(
+    "Bookmark",
+    back_populates="owner",
+    cascade="all, delete"
+)

@@ -21,3 +21,20 @@ class Post(Base):
         "User",
         back_populates="posts",
     )
+
+    comments = relationship(
+    "Comment",
+    back_populates="post",
+    cascade="all, delete"
+)
+    likes = relationship(
+    "Like",
+    back_populates="post",
+    cascade="all, delete"
+)
+
+    bookmarks = relationship(
+    "Bookmark",
+    back_populates="post",
+    cascade="all, delete"
+)
