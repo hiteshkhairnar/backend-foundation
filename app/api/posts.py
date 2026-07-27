@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 
 from app.database.database import get_db
@@ -6,6 +6,7 @@ from app.schemas.post import (
     PostCreate,
     PostResponse,
     PostWithOwner,
+    PaginatedPosts,
 )
 from app.services.post_service import (
     create_post,
@@ -44,12 +45,21 @@ def create_new_post(
 # Get All Posts
 # ----------------------------------
 
-@router.get("/", response_model=list[PostWithOwner])
+@router.get("/", response_model=PaginatedPosts)
 def read_posts(
+    page: int = Query(1, ge=1),
+    limit: int = Query(10, ge=1, le=100),
+    search: str = "",
+    sort: str = "latest",
     db: Session = Depends(get_db),
 ):
-    return get_posts(db)
-
+    return get_posts(
+        db=db,
+        page=page,
+        limit=limit,
+        search=search,
+        sort=sort,
+    )
 
 # ----------------------------------
 # Get Single Post

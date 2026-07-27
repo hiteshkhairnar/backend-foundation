@@ -1,4 +1,5 @@
 from pydantic import BaseModel
+from datetime import datetime
 
 
 class CommentCreate(BaseModel):
@@ -10,6 +11,7 @@ class CommentResponse(BaseModel):
     content: str
     user_id: int
     post_id: int
+    created_at: datetime
 
     class Config:
         from_attributes = True
@@ -27,6 +29,7 @@ class CommentOwner(BaseModel):
 class CommentWithOwner(BaseModel):
     id: int
     content: str
+    created_at: datetime
 
     owner: CommentOwner
 

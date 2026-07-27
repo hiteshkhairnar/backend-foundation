@@ -1,47 +1,47 @@
 import os
+import shutil
 import uuid
+
 from fastapi import UploadFile, HTTPException
 
-UPLOAD_DIR = "uploads/profiles"
 
-ALLOWED_TYPES = {
-    "image/jpeg",
-    "image/png",
-    "image/jpg"
+UPLOAD_FOLDER = "uploads"
+
+ALLOWED_EXTENSIONS = {
+    ".jpg",
+    ".jpeg",
+    ".png",
+    ".gif",
+    ".webp",
 }
-
-MAX_FILE_SIZE = 2 * 1024 * 1024  # 2 MB
 
 
 def save_profile_image(file: UploadFile):
-    # Validate content type
-    if file.content_type not in ALLOWED_TYPES:
+
+    extension = os.path.splitext(file.filename)[1].lower()
+
+    if extension not in ALLOWED_EXTENSIONS:
         raise HTTPException(
             status_code=400,
-            detail="Only JPG, JPEG and PNG files are allowed."
+            detail="Only image files are allowed.",
         )
 
-    # Read file
-    content = file.file.read()
-
-    # Validate size
-    if len(content) > MAX_FILE_SIZE:
-        raise HTTPException(
-            status_code=400,
-            detail="File size must be less than 2 MB."
-        )
-
-    # Create uploads directory if it doesn't exist
-    os.makedirs(UPLOAD_DIR, exist_ok=True)
-
-    # Generate unique filename
-    extension = os.path.splitext(file.filename)[1]
     filename = f"{uuid.uuid4()}{extension}"
 
-    filepath = os.path.join(UPLOAD_DIR, filename)
+    os.makedirs(
+        UPLOAD_FOLDER,
+        exist_ok=True,
+    )
 
-    # Save file
-    with open(filepath, "wb") as f:
-        f.write(content)
+    file_path = os.path.join(
+        UPLOAD_FOLDER,
+        filename,
+    )
 
-    return filepath
+    with open(file_path, "wb") as buffer:
+        shutil.copyfileobj(
+            file.file,
+            buffer,
+        )
+
+    return file_path

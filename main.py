@@ -1,3 +1,4 @@
+from fastapi.staticfiles import StaticFiles
 from fastapi import FastAPI, Request
 from fastapi.staticfiles import StaticFiles
 from fastapi.exceptions import RequestValidationError
@@ -16,6 +17,7 @@ from app.models.post import Post
 from app.models.comment import Comment
 from app.models.like import Like
 from app.models.bookmark import Bookmark
+from app.api.celery import router as celery_router
 
 from app.exceptions.handlers import (
     validation_exception_handler,
@@ -78,6 +80,11 @@ app.add_exception_handler(
     generic_exception_handler,
 )
 
+app.mount(
+    "/uploads",
+    StaticFiles(directory="uploads"),
+    name="uploads",
+)
 # ----------------------------------------------------
 # Routers
 # ----------------------------------------------------
@@ -88,6 +95,7 @@ app.include_router(posts_router)
 app.include_router(comments_router)
 app.include_router(likes_router)
 app.include_router(bookmarks_router)
+app.include_router(celery_router)
 # ----------------------------------------------------
 # Static Files
 # ----------------------------------------------------

@@ -34,6 +34,7 @@ def like_post(
 
     db.add(like)
     db.commit()
+    db.refresh(like)
 
     return like
 
@@ -59,3 +60,31 @@ def unlike_post(
     db.commit()
 
     return True
+
+
+def get_like_count(
+    db: Session,
+    post_id: int,
+):
+    return (
+        db.query(Like)
+        .filter(Like.post_id == post_id)
+        .count()
+    )
+
+
+def is_post_liked(
+    db: Session,
+    post_id: int,
+    current_user: User,
+):
+    like = (
+        db.query(Like)
+        .filter(
+            Like.post_id == post_id,
+            Like.user_id == current_user.id,
+        )
+        .first()
+    )
+
+    return like is not None

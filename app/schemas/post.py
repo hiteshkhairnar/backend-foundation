@@ -50,3 +50,13 @@ class PostWithOwner(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+class PaginatedPosts(BaseModel):
+    total: int
+    page: int
+    limit: int
+    posts: list[PostWithOwner]
+
+    class Config:
+        from_attributes = True

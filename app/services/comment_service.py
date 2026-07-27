@@ -85,3 +85,14 @@ def delete_comment(
     db.commit()
 
     return True
+
+def get_comment(
+    db: Session,
+    comment_id: int,
+):
+    return (
+        db.query(Comment)
+        .options(joinedload(Comment.owner))
+        .filter(Comment.id == comment_id)
+        .first()
+    )

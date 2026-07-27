@@ -1,4 +1,5 @@
 from sqlalchemy.orm import Session, joinedload
+from sqlalchemy import or_, desc
 
 from app.models.post import Post
 from app.models.user import User
@@ -28,22 +29,61 @@ def create_post(
 
 
 # ----------------------------
-# Get All Posts with Owner
+# Get Posts (Search + Pagination + Sorting)
 # ----------------------------
 
-def get_posts(db: Session):
-    return (
-        db.query(Post)
-        .options(joinedload(Post.owner))
+def get_posts(
+    db: Session,
+    page: int = 1,
+    limit: int = 10,
+    search: str = "",
+    sort: str = "latest",
+):
+    query = db.query(Post).options(
+        joinedload(Post.owner)
+    )
+
+    if search:
+        query = query.filter(
+            or_(
+                Post.title.ilike(f"%{search}%"),
+                Post.content.ilike(f"%{search}%"),
+            )
+        )
+
+    if sort == "title":
+        query = query.order_by(Post.title)
+
+    elif sort == "oldest":
+        query = query.order_by(Post.id)
+
+    else:
+        query = query.order_by(desc(Post.id))
+
+    total = query.count()
+
+    posts = (
+        query.offset((page - 1) * limit)
+        .limit(limit)
         .all()
     )
+
+    return {
+        "total": total,
+        "page": page,
+        "limit": limit,
+        "posts": posts,
+    }
 
 
 # ----------------------------
 # Get Single Post
 # ----------------------------
 
-def get_post(db: Session, post_id: int):
+def get_post(
+    db: Session,
+    post_id: int,
+):
     return (
         db.query(Post)
         .options(joinedload(Post.owner))
