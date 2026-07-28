@@ -1,6 +1,41 @@
+# Python
 venv/
 __pycache__/
-*.pyc
-.git
+*.py[cod]
+*.pyo
+*.pyd
+
+# Pytest
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Git
+.git/
 .gitignore
+
+# Environment
+.env
+.env.*
+
+# Logs
+logs/
+*.log
+
+# Uploads
 uploads/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Build
+dist/
+build/
+
+# Misc
+*.sqlite3
