@@ -1,10 +1,20 @@
+import os
+
 from celery import Celery
+
+
+REDIS_URL = os.getenv(
+    "REDIS_URL",
+    "redis://redis:6379/0",
+)
+
 
 celery = Celery(
     "backend_foundation",
-    broker="redis://redis:6379/0",
-    backend="redis://redis:6379/0",
+    broker=REDIS_URL,
+    backend=REDIS_URL,
 )
+
 
 celery.conf.update(
     task_serializer="json",
@@ -13,6 +23,7 @@ celery.conf.update(
     timezone="UTC",
     enable_utc=True,
 )
+
 
 # Import all task modules
 celery.autodiscover_tasks(["app.tasks"])
