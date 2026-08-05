@@ -89,9 +89,4 @@ def health_check():
 # ----------------------------------------------------
 
 app.include_router(main_router)
-app.include_router(users_router)
-app.include_router(posts_router)
-app.include_router(comments_router)
-app.include_router(likes_router)
-app.include_router(bookmarks_router)
 app.include_router(celery_router)
